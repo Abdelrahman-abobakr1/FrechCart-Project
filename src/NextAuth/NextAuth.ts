@@ -67,40 +67,9 @@ GoogleProvider({
         token.provider = account?.provider || "credentials";
 
         if (account?.provider === "google" || account?.provider === "facebook") {
-          const secretPass = process.env.SOCIAL_LOGIN_PASSWORD || "Social_Login_Secure_123!";
-          try {
-            let response = await fetch(`${BASE_URL}/api/v1/auth/signin`, {
-              method: "POST",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify({ email: user.email, password: secretPass }),
-            });
-            let resData = await response.json();
-
-            if (resData.message !== "success") {
-              const signupRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({
-                  name: user.name,
-                  email: user.email,
-                  password: secretPass,
-                  rePassword: secretPass,
-                  phone: "01012345678",
-                }),
-              });
-              const signupData = await signupRes.json();
-              if (signupData.message === "success") {
-                token.credentialToken = signupData.token;
-              } else {
-                token.credentialToken = "";
-              }
-            } else {
-              token.credentialToken = resData.token;
-            }
-          } catch (e) {
-            console.error("Backend sync failed:", e);
-            token.credentialToken = "";
-          }
+          // Simplified: just set a token for OAuth users
+          token.credentialToken = `oauth_${account.provider}_${user.id}_${Date.now()}`;
+          console.log("OAuth user authenticated, token set");
         } else {
           token.credentialToken = user.userToken;
         }
