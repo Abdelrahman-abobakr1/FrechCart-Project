@@ -62,16 +62,29 @@ GoogleProvider({
   secret: process.env.NEXTAUTH_SECRET || "Social_Login_Development_Secret_123!_Change_For_Production",
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 30 * 24 * 60 * 60,
+      },
+    },
   },
   pages: { signIn: "/signin" },
   callbacks: {
-    signIn: async ({ user, account }: any) => {
-      console.log("SignIn callback triggered:", { user: user?.email, provider: account?.provider });
+    async signIn({ user, account, profile }) {
       return true;
     },
-    jwt: async function ({ user, token, account }: any) {
-      console.log("JWT callback:", { hasUser: !!user, hasToken: !!token, provider: account?.provider });
+    async redirect({ url, baseUrl }) {
+      return baseUrl;
+    },
+    jwt: async function ({ user, token, account }) {
 
       if (user) {
         token.userId = user.id;
@@ -80,19 +93,16 @@ GoogleProvider({
         token.provider = account?.provider || "credentials";
 
         if (account?.provider === "google" || account?.provider === "facebook") {
-          // Simplified: just set a token for OAuth users
-          token.credentialToken = `oauth_${account.provider}_${user.id}_${Date.now()}`;
-          console.log("OAuth user authenticated, token set");
+          token.credentialToken = user.userToken || `oauth_${account.provider}_${user.id}`;
         } else {
           token.credentialToken = user.userToken;
         }
       }
       return token;
     },
-    session: function ({ session, token }: any) {
-      console.log("Session callback:", { hasSession: !!session, hasToken: !!token });
+    session: function ({ session, token }) {
 
-      if (session.user) {
+      if (token) {
         session.user.id = token.userId;
         session.user.email = token.email;
         session.user.name = token.name;

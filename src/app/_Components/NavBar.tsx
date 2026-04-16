@@ -13,7 +13,7 @@ import { getWishlist } from "./Wishlist/wishlist.action";
 import { useRouter } from "next/navigation";
 
 export default function NavBar() {
-  const s = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -122,7 +122,7 @@ export default function NavBar() {
                 {cartCount ? <span className="absolute -top-2 -right-2 w-[18px] h-[18px] bg-[#0aad0a] text-white text-[11px] font-bold rounded-full flex items-center justify-center">{ cartCount}</span>:''}
               </Link>
               
-              {s.status === "authenticated" ? (
+{status === "authenticated" ? (
                 <div className="relative group cursor-pointer hidden md:flex items-center">
                  <div className="w-[36px] h-[36px] rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center transition-colors group-hover:border-[#0aad0a]/30 group-hover:bg-green-50">
                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -137,7 +137,7 @@ export default function NavBar() {
                              <path d="M15.8789 15.6094C15.1328 13.7852 13.3398 12.5 11.25 12.5H8.75C6.66016 12.5 4.86719 13.7852 4.12109 15.6094C2.73047 14.1523 1.875 12.1758 1.875 10C1.875 5.51172 5.51172 1.875 10 1.875C14.4883 1.875 18.125 5.51172 18.125 10C18.125 12.1758 17.2695 14.1484 15.8789 15.6094ZM14.3125 16.8867C13.0625 17.6719 11.5859 18.125 10 18.125C8.41406 18.125 6.9375 17.6719 5.68359 16.8867C5.96875 15.4531 7.23438 14.375 8.75 14.375H11.25C12.7656 14.375 14.0312 15.4531 14.3164 16.8867H14.3125ZM10 20C12.6522 20 15.1957 18.9464 17.0711 17.0711C18.9464 15.1957 20 12.6522 20 10C20 7.34784 18.9464 4.8043 17.0711 2.92893C15.1957 1.05357 12.6522 0 10 0C7.34784 0 4.8043 1.05357 2.92893 2.92893C1.05357 4.8043 0 7.34784 0 10C0 12.6522 1.05357 15.1957 2.92893 17.0711C4.8043 18.9464 7.34784 20 10 20ZM10 9.375C9.5856 9.375 9.18817 9.21038 8.89515 8.91735C8.60212 8.62433 8.4375 8.2269 8.4375 7.8125C8.4375 7.3981 8.60212 7.00067 8.89515 6.70765C9.18817 6.41462 9.5856 6.25 10 6.25C10.4144 6.25 10.8118 6.41462 11.1049 6.70765C11.3979 7.00067 11.5625 7.3981 11.5625 7.8125C11.5625 8.2269 11.3979 8.62433 11.1049 8.91735C10.8118 9.21038 10.4144 9.375 10 9.375ZM6.5625 7.8125C6.5625 8.72418 6.92466 9.59852 7.56932 10.2432C8.21398 10.8878 9.08832 11.25 10 11.25C10.9117 11.25 11.786 10.8878 12.4307 10.2432C13.0753 9.59852 13.4375 8.72418 13.4375 7.8125C13.4375 6.90082 13.0753 6.02648 12.4307 5.38182C11.786 4.73716 10.9117 4.375 10 4.375C9.08832 4.375 8.21398 4.73716 7.56932 5.38182C6.92466 6.02648 6.5625 6.90082 6.5625 7.8125Z" fill="#0aad0a"/>
                            </svg>
                          </div>
-                         <div className="font-bold text-[#1e293b] text-[14px] leading-tight">{s.data?.user?.name || "User"}</div>
+                         <div className="font-bold text-[#1e293b] text-[14px] leading-tight">{session.data?.user?.name || "User"}</div>
                        </div>
                        <div className="py-1.5 flex flex-col text-[14px]">
                         <Link href="/account/settings" className="px-5 py-[9px] hover:bg-gray-50 flex items-center gap-3 text-gray-600 hover:text-[#0aad0a] transition-colors font-medium">
@@ -258,7 +258,7 @@ export default function NavBar() {
                 </div>
                 {cartCount > 0 && <div className="w-6 h-6 rounded-full bg-[#0aad0a] text-white flex items-center justify-center text-[12px] font-bold">{cartCount}</div>}
              </Link>
-             {s.status === "authenticated" && (
+             {session.status === "authenticated" && (
                <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between text-gray-700 font-medium hover:text-[#0aad0a] group transition-colors">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-100 transition-colors">
@@ -280,7 +280,7 @@ export default function NavBar() {
                     <div className="w-10 h-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-[#4b5563]">
                       <User className="w-[18px] h-[18px] stroke-2" />
                     </div>
-                    <span className="text-[15px]">{s.data?.user?.name || "User"}</span>
+                    <span className="text-[15px]">{session.data?.user?.name || "User"}</span>
                  </Link>
                  <button onClick={() => { signOut(); setIsMobileMenuOpen(false); }} className="flex items-center gap-4 text-red-500 font-medium hover:opacity-80 transition-opacity">
                     <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500">

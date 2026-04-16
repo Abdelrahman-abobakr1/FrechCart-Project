@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
-  Trash2, Plus, Minus, Lock, Tag, Box, ArrowLeft, ArrowRight, Check 
+  Trash2, Plus, Minus, Lock, Tag, Box, ArrowLeft, ArrowRight, Check, ShoppingCart 
 } from 'lucide-react';
 import { getUserCart, handleAddProductToCart } from '../_Components/AddToCart/AddProductToCart.action';
 import HandleProductQuntity from '../_Components/AddToCart/HandleProductQuntity';
@@ -30,6 +30,31 @@ const CartHeaderIcon = () => (
 
 export default async function CartPage() {
   const { numOfCartItems, cartId, totalCartPrice, products, } = await getUserCart()
+  
+  if (!cartId && numOfCartItems === 0) {
+    return (
+      <div className="page-shell">
+        <div className="page-container">
+          <div className="flex items-center gap-2 text-[13px] text-gray-400 mb-6">
+            <Link href="/" className="hover:text-gray-600 transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-[#1e293b] font-medium">Shopping Cart</span>
+          </div>
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+              <ShoppingCart className="w-10 h-10 text-gray-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h2>
+            <p className="text-gray-500 mb-6">Looks like you haven't added anything to your cart yet.</p>
+            <Link href="/shop" className="bg-[#0aad0a] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#088a08] transition-colors">
+              Start Shopping
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  
   const subtotal = totalCartPrice || 0;
   const FREE_SHIPPING_THRESHOLD = 500;
   const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 50;
