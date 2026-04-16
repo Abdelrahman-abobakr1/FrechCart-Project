@@ -47,13 +47,22 @@ GoogleProvider({
 
   ],
   secret: process.env.NEXTAUTH_SECRET || "Social_Login_Development_Secret_123!_Change_For_Production",
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   pages: { signIn: "/signin" },
   callbacks: {
+    signIn: async ({ user, account }: any) => {
+      // Allow all sign-ins to proceed
+      return true;
+    },
     jwt: async function ({ user, token, account }: any) {
       if (user) {
         token.userId = user.id;
         token.email = user.email;
         token.name = user.name;
+        token.provider = account?.provider || "credentials";
 
         if (account?.provider === "google" || account?.provider === "facebook") {
           const secretPass = process.env.SOCIAL_LOGIN_PASSWORD || "Social_Login_Secure_123!";
@@ -81,7 +90,6 @@ GoogleProvider({
               if (signupData.message === "success") {
                 token.credentialToken = signupData.token;
               } else {
-                // If signup fails, still allow login
                 token.credentialToken = "";
               }
             } else {
@@ -89,7 +97,6 @@ GoogleProvider({
             }
           } catch (e) {
             console.error("Backend sync failed:", e);
-            // If API call fails, still set a token to maintain session
             token.credentialToken = "";
           }
         } else {
@@ -103,6 +110,7 @@ GoogleProvider({
         session.user.id = token.userId;
         session.user.email = token.email;
         session.user.name = token.name;
+        session.user.provider = token.provider;
         session.user.credentialToken = token.credentialToken;
       }
       return session;
