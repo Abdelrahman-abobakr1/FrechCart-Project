@@ -9,21 +9,19 @@ import { getUserOrders } from './Orders.action';
 import { Package, ShoppingBag, Clock, Hash, Banknote, CalendarDays, MapPin, ChevronDown, Receipt, Phone, Truck } from 'lucide-react'; 
 
 export default function MyOrdersPage() {
-  const { status } = useSession();
   const router = useRouter();
+  const { status } = useSession({ required: true, onUnauthenticated() { router.push('/signin'); } });
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/signin');
-    } else if (status === 'authenticated') {
+    if (status === 'authenticated') {
       getUserOrders().then((data) => {
         setOrders(Array.isArray(data) ? data : []);
         setLoading(false);
       });
     }
-  }, [status, router]);
+  }, [status]);
 
   if (status === "loading" || loading) {
     return (

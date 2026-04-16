@@ -8,44 +8,57 @@ import FacebookProvider from "next-auth/providers/facebook";
 export const nextAuthConfig: NextAuthOptions = {
   providers: [
     Credentials({
-      name: "signin",
+      name: "Credentials",
       credentials: {
-        email: { type: "email" },
-        password: { type: "password" },
+        email: { label: "Email", type: "email", placeholder: "email@example.com" },
+        password: { label: "Password", type: "password" },
       },
       authorize: async function (credentials) {
-        const response = await fetch(
-          `${BASE_URL}/api/v1/auth/signin`,
-          {
-            method: "POST",
-            headers: {
-              "content-type": "application/json",
-            },
-            body: JSON.stringify({
-              email: credentials?.email,
-              password: credentials?.password,
-            }),
-          },
-        );
-        const resData = await response.json();
-        const x: any = jwtDecode(resData.token);
+        try {
+          const response = await fetch(
+            `${BASE_URL}/api/v1/auth/signin`,
+            {
+              method: "POST",
+              headers: {
+                "content-type": "application/json",
+              },
+              body: JSON.stringify({
+                email: credentials?.email,
+                password: credentials?.password,
+              }),
+            }
+          );
+          
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: "Authentication failed" }));
+            throw new Error(errorData.message || "Authentication failed");
+          }
+          
+          const resData = await response.json();
 
-        if (resData.message === "success") {
-          const { role, ...userData } = resData.user;
-          return {...userData,id:x.id,userToken:resData.token};
+          if (resData.message === "success") {
+            const x: any = jwtDecode(resData.token);
+            const { role, ...userData } = resData.user;
+            return {...userData,id:x.id,userToken:resData.token};
+          }
+
+          throw new Error(resData.message || "Invalid credentials");
+        } catch (error) {
+          console.error("Auth error:", error);
+          throw error;
         }
-
-        return null;
       },
     }),
 
 GoogleProvider({
-  clientId: process.env.GOOGLE_CLIENT_ID || "",
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-}),
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
+    }),
 
 
   ],
+  trustHost: true,
   secret: process.env.NEXTAUTH_SECRET || "Social_Login_Development_Secret_123!_Change_For_Production",
   session: {
     strategy: "jwt",

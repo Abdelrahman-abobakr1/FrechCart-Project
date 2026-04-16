@@ -1,3 +1,8 @@
+"use client";
+
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { Truck, ShieldCheck, Clock } from "lucide-react";
@@ -6,6 +11,18 @@ import loginImage from "@/assets/images/381609d78c4d97f9277837bc4bdf05035b888463
 import SignInForm from "./SingInForm";
 
 export default function SigninPage() {
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/");
+    }
+  }, [status, router]);
+
+  if (status === "authenticated") {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex justify-center">

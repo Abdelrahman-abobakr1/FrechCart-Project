@@ -27,13 +27,11 @@ export default function CheckoutPage() {
   const [subtotal, setSubtotal] = useState<number>(0);
   const [isOrdering, setIsOrdering] = useState(false);
 
-  const { status } = useSession();
   const router = useRouter();
+  const { status } = useSession({ required: true, onUnauthenticated() { router.push('/signin'); } });
 
   React.useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/signin');
-    } else if (status === 'authenticated') {
+    if (status === 'authenticated') {
       getUserCart().then((res: any) => {
         if (res) {
           setCartId(res.cartId);
@@ -42,7 +40,7 @@ export default function CheckoutPage() {
         }
       });
     }
-  }, [status, router]);
+  }, [status]);
 
   const total = subtotal;
 

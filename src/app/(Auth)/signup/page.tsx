@@ -1,10 +1,27 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Star } from 'lucide-react';
 import RegisterForm from './RegisterForm';
 
 export default function SignupPage() {
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.replace('/');
+    }
+  }, [status, router]);
+
+  if (status === 'authenticated') {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-[#f8fafc] flex justify-center">
       <div className="w-full max-w-287.5 flex flex-col lg:flex-row">
