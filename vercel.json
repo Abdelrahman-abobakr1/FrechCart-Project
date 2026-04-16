@@ -2,14 +2,5 @@
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-  "framework": "nextjs",
-  "env": [
-    "NEXT_PUBLIC_API_URL",
-    "NEXTAUTH_URL",
-    "NEXTAUTH_SECRET",
-    "GOOGLE_CLIENT_ID",
-    "GOOGLE_CLIENT_SECRET",
-    "NEXTAUTH_SECRET",
-    "SOCIAL_LOGIN_PASSWORD"
-  ]
+  "framework": "nextjs"
 }
