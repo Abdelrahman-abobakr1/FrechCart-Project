@@ -8,11 +8,12 @@ import { schemaSignIn } from "./SignInSchema";
 import sendUserLogin from "./SignIn.services";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import * as zod from "zod";
 
 export default function SignInForm() {
   const router = useRouter();
+  const { update } = useSession();
   const { handleSubmit, control, formState: { errors } } = useForm({
     defaultValues: {
       email: "",
@@ -29,6 +30,7 @@ export default function SignInForm() {
     });
 
     if (res?.ok) {
+      await update();
       toast.success("Welcome to our store", {
         position: "top-right",
       });

@@ -1,22 +1,21 @@
 import { withAuth } from "next-auth/middleware";
 
-export default withAuth(
-  function middleware(req) {
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        if (req.nextUrl.pathname.startsWith('/signin') ||
-            req.nextUrl.pathname.startsWith('/signup') ||
-            req.nextUrl.pathname.startsWith('/api/auth')) {
-          return true;
-        }
-
-        return !!token;
-      },
+export default withAuth({
+  callbacks: {
+    authorized: ({ req, token }) => {
+      const path = req.nextUrl.pathname;
+      
+      if (path.startsWith('/signin') || 
+          path.startsWith('/signup') || 
+          path.startsWith('/api/auth') ||
+          path === '/') {
+        return true;
+      }
+      
+      return token !== null;
     },
-  }
-);
+  },
+});
 
 export const config = {
   matcher: [
