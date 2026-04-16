@@ -54,10 +54,12 @@ GoogleProvider({
   pages: { signIn: "/signin" },
   callbacks: {
     signIn: async ({ user, account }: any) => {
-      // Allow all sign-ins to proceed
+      console.log("SignIn callback triggered:", { user: user?.email, provider: account?.provider });
       return true;
     },
     jwt: async function ({ user, token, account }: any) {
+      console.log("JWT callback:", { hasUser: !!user, hasToken: !!token, provider: account?.provider });
+
       if (user) {
         token.userId = user.id;
         token.email = user.email;
@@ -106,6 +108,8 @@ GoogleProvider({
       return token;
     },
     session: function ({ session, token }: any) {
+      console.log("Session callback:", { hasSession: !!session, hasToken: !!token });
+
       if (session.user) {
         session.user.id = token.userId;
         session.user.email = token.email;
