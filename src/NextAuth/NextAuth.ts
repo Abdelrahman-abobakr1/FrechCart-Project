@@ -52,6 +52,8 @@ GoogleProvider({
     jwt: async function ({ user, token, account }: any) {
       if (user) {
         token.userId = user.id;
+        token.email = user.email;
+        token.name = user.name;
 
         if (account?.provider === "google" || account?.provider === "facebook") {
           const secretPass = process.env.SOCIAL_LOGIN_PASSWORD || "Social_Login_Secure_123!";
@@ -78,12 +80,17 @@ GoogleProvider({
               const signupData = await signupRes.json();
               if (signupData.message === "success") {
                 token.credentialToken = signupData.token;
+              } else {
+                // If signup fails, still allow login
+                token.credentialToken = "";
               }
             } else {
               token.credentialToken = resData.token;
             }
           } catch (e) {
             console.error("Backend sync failed:", e);
+            // If API call fails, still set a token to maintain session
+            token.credentialToken = "";
           }
         } else {
           token.credentialToken = user.userToken;
@@ -94,6 +101,8 @@ GoogleProvider({
     session: function ({ session, token }: any) {
       if (session.user) {
         session.user.id = token.userId;
+        session.user.email = token.email;
+        session.user.name = token.name;
         session.user.credentialToken = token.credentialToken;
       }
       return session;
